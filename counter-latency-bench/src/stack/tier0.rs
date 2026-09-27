@@ -73,6 +73,7 @@ pub async fn seed_counters(
         "singleton",
         Counter::new(seed_value).context("Counter::new for seed")?,
         &v_seed,
+        valence::use_!(r#"**Test:** Fixture **Counter** save for `stack` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#),
     )
     .await
     .context("seed Counter singleton")?;
@@ -81,6 +82,7 @@ pub async fn seed_counters(
         &user_pk,
         UserCounter::new(user_record, seed_value).context("UserCounter::new for seed")?,
         &v_seed,
+        valence::use_!(r#"**Test:** Fixture **User Counter** save for `stack` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#),
     )
     .await
     .context("seed UserCounter")?;

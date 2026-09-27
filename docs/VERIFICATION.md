@@ -60,11 +60,12 @@ cargo test -p counter-app-worker --test scripts_contract
 CI clippy uses `-- -D warnings` on the same packages (job clears global `RUSTFLAGS`
 only when needed; deny is via the clippy flag).
 
-### leptos-lints (local; hydrate UI)
+### leptos-lints (CI job `leptos-lints`)
 
 Needs `cargo-dylint` / `dylint-link` 6.0.1 and toolchain `nightly-2025-05-14`
 (see `leptos-lints@v0.1.2`). Workspace `[workspace.metadata.dylint]` pins the
 library; rustc deny names are declared under `[workspace.lints.rust]`.
+GitHub Actions runs the same command.
 
 ```bash
 # cargo install cargo-dylint --locked --version 6.0.1
@@ -92,8 +93,7 @@ service gap. Existing UI-crate binaries (`app_metadata_test`, `server_fn_paths`,
 Workspace notes:
 
 - `counter-latency-bench` is excluded from the workspace (Surreal-era harness).
-- Axum Photon WS lives in `photon-axum` (photon-leptos); former `photon-wiring-axum`
-  kit is archived at https://github.com/deathbreakfast/photon-wiring-axum-archive.
+- Axum Photon WS lives in `photon-axum` (photon-leptos).
 
 ## Layer 2 — E2E (`counter-ui-e2e`)
 
@@ -115,12 +115,12 @@ cargo leptos end-to-end --project counter-ui-e2e
 
 Host: `127.0.0.1:3000`. Do not Ctrl-C; wait for Playwright to exit.
 
-L5 `unified-field-embedded` still ships a one-click composition smoke
+`unified-field-embedded` still ships a one-click composition smoke
 (`counter-click-demo.spec.ts`). Product feature depth stays in `counter-ui-e2e`.
 
 ## Layer 3 — Cloud + performance
 
-**Waived.** L3-local product; no cloud resources. `counter-latency-bench` is
+**Waived.** Local-only product; no cloud resources. `counter-latency-bench` is
 excluded from the workspace (pre-router Surreal harness). Correctness is
 in-process against an embedded SQLite `:memory:` Valence for Layer 1, plus the
 Layer 2 lab host above.
@@ -138,10 +138,6 @@ RUSTDOCFLAGS="-D rustdoc::broken-intra-doc-links" cargo doc \
 RUSTDOCFLAGS="-D rustdoc::broken-intra-doc-links" cargo doc \
   -p counter-app --features ssr --no-deps
 ```
-
-For guide-contract audits, point `CARGO_TARGET_DIR` at the same tree as
-`uf-docs-guide-contracts/workspaces/counter-app/doc-guide-spec.toml` `doc_root`
-(typically `uf-docs-data/target-counter-app`).
 
 `counter-app` still uses `#![allow(missing_docs)]` on macro-heavy UI surfaces
 (`uf_app!`, `orbital_routes_extract`). Hand-written items carry teaching rustdoc.
