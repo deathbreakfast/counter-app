@@ -41,14 +41,23 @@ fn validate_increment_amount_over_max_rejected_sad() {
     assert!(msg.contains(&MAX_INCREMENT_AMOUNT.to_string()), "got {msg}");
 }
 
+/// Process-global env + shared `"anon-increment"` bucket — serialize this suite.
+static ANON_RATE_LIMIT_TEST_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
 #[test]
 fn validate_anon_increment_accepts_in_range_happy_path() {
+    let _guard = ANON_RATE_LIMIT_TEST_LOCK
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner);
     validate_anon_increment(1).expect("1 ok");
     validate_anon_increment(MAX_ANON_INCREMENT_AMOUNT).expect("anon max ok");
 }
 
 #[test]
 fn validate_anon_increment_over_anon_max_rejected_sad() {
+    let _guard = ANON_RATE_LIMIT_TEST_LOCK
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner);
     let err = validate_anon_increment(MAX_ANON_INCREMENT_AMOUNT + 1).expect_err("over anon max");
     let msg = err.to_string();
     assert!(msg.contains("validation failed"), "got {msg}");
@@ -65,9 +74,6 @@ fn rate_limited_variant_display_sad() {
     assert!(msg.contains("rate limit"), "got {msg}");
     assert!(!msg.starts_with("validation failed"), "got {msg}");
 }
-
-/// Process-global env + shared `"anon-increment"` bucket — serialize this suite.
-static ANON_RATE_LIMIT_TEST_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
 
 #[test]
 fn validate_anon_increment_rate_limit_exhaustion_sad() {
