@@ -183,7 +183,7 @@ async fn notify_rank_change(valence: &valence::Valence, uid: &str, message: Stri
             title: "Leaderboard Update".into(),
             message,
             url: Some(crate::paths::HIGH_SCORES.into()),
-            data_json: None,
+            ..Default::default()
         },
         valence,
     )
